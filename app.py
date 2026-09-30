@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
+import os
+import gdown
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -125,8 +127,25 @@ hr {
 
 model = joblib.load("fraud_detection_model.pkl")
 
-df = pd.read_csv("data/creditcard.csv")
+# Download dataset from Google Drive if it is not available
+DATA_PATH = "data/creditcard.csv"
+FILE_ID = "1oUi213x0VyqVjD02oe_DvjCtZad9bSfr"
 
+os.makedirs("data", exist_ok=True)
+
+if not os.path.exists(DATA_PATH):
+    with st.spinner("Downloading dataset from Google Drive..."):
+        downloaded_file = gdown.download(
+            id=FILE_ID,
+            output=DATA_PATH,
+            quiet=False
+        )
+
+    if downloaded_file is None or not os.path.exists(DATA_PATH):
+        st.error("Dataset download failed. Please check Google Drive sharing settings.")
+        st.stop()
+
+df = pd.read_csv(DATA_PATH)
 
 # --------------------------------------------------
 # PREPARE DATA
